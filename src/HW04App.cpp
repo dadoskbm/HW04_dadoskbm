@@ -21,7 +21,7 @@ class HW04App : public AppBasic {
 void HW04App::setup()
 {
 	vector<Entry*> entries = vector<Entry*>();
-	fstream in = fstream("..\\resources\\Starbucks_2006.csv", fstream::in );
+	ifstream in = ifstream("..\\resources\\Starbucks_2006.csv", fstream::in );
 	if(!in.is_open())
 	{
 		console() << "Error opening file" << endl;
