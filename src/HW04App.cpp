@@ -30,7 +30,7 @@ void HW04App::setup()
 	while(in.good())
 	{
 		string line;
-		getline(in, line);
+		getline(in, line, '\r');
 		//Find locations of the commas
 		int comma1 = line.find(',');
 		int comma2 = line.find(',', comma1 + 1);
@@ -39,21 +39,20 @@ void HW04App::setup()
 			console() << "Error: Malformed file, line " << entries.size() << endl;
 			exit(2);
 		}
-		string str1 = line.substr(0,comma1 - 1),
-			str2 = line.substr(comma1, comma2 - comma1 - 1),
-			str3 = line.substr(comma2);
-		console() << line << endl;
+		string str1 = line.substr(0,comma1),
+			str2 = line.substr(comma1 + 1, comma2 - comma1 - 1),
+			str3 = line.substr(comma2 + 1);
 		Entry* e = new Entry;
 		e->identifier = str1;
 		e->x = atof(str2.c_str());
 		e->y = atof(str2.c_str());
 		entries.push_back(e);
 	}
-	/*for(unsigned int i = 0; i < entries.size(); i++)
+	for(unsigned int i = 0; i < entries.size(); i++)
 	{
 		console() << entries[i]->identifier << ", " 
 			<< entries[i]->x << ", " << entries[i]->y << endl;
-	}*/
+	}
 	
 
 }
