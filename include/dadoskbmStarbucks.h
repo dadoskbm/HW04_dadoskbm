@@ -20,16 +20,18 @@
  */
 class Node
 {
-	Entry* item;
+public:
+	Entry item;
 	Node* leftX;
 	Node* leftY;
 	Node* rightX;
 	Node* rightY;
 
+
 	/**
 	 * Creates a node for a given item and initializes the child nodes to NULL
 	 */
-	Node(Entry* item);
+	Node(Entry item);
 
 	/**
 	 * Calculates the distance between this node and the given points.
@@ -46,6 +48,12 @@ class Node
 class dadoskbmStarbucks : public Starbucks
 {
 public:
+
+	/**
+	 * Constructor.
+	 */
+	dadoskbmStarbucks();
+
 	/**
 	 * Creates a node for each entry and places it in the proper position in each
 	 * binary search tree. NOTE: some locations are listed twice, duplicates must
@@ -63,4 +71,9 @@ public:
 	 * @return Closest entry
 	 */
 	virtual Entry* getNearest(double x,double y);
+
+private:
+	//Root node. Due to the way tree placement is designed, this can be used for both X and Y trees.
+	Node* root;
+
 };
