@@ -4,7 +4,6 @@
 #include <fstream>
 #include <string>
 
-#define SHOW_TIMES
 
 using namespace ci;
 using namespace ci::app;
@@ -16,11 +15,14 @@ class HW04App : public AppBasic {
 	void mouseDown( MouseEvent event );	
 	void update();
 	void draw();
+
+private:
+	Starbucks* starbucks;
 };
 
 void HW04App::setup()
 {
-	vector<Entry*> entries = vector<Entry*>();
+	vector<Entry> entries = vector<Entry>();
 	ifstream in = ifstream("..\\resources\\Starbucks_2006.csv", fstream::in );
 	if(!in.is_open())
 	{
@@ -46,14 +48,30 @@ void HW04App::setup()
 		e->identifier = str1;
 		e->x = atof(str2.c_str());
 		e->y = atof(str2.c_str());
-		entries.push_back(e);
-	}
-	for(unsigned int i = 0; i < entries.size(); i++)
-	{
-		console() << entries[i]->identifier << ", " 
-			<< entries[i]->x << ", " << entries[i]->y << endl;
+		entries.push_back(*e);
 	}
 	
+	//Vector of entries is built, convert to array and call dadoskbmStarbucks.build()
+
+	Entry* arr = new Entry[entries.size()];
+	for(unsigned int i = 0; i < entries.size(); i++)
+		arr[i] = entries[i];
+
+	starbucks = new dadoskbmStarbucks();
+	starbucks->build(arr, entries.size());
+
+	/*double x, y;
+	console() << "Enter in X-coordinate: ";
+	cin >> x;
+	console() << endl;
+	console() << "Enter in Y-coordinate: ";
+	cin >> y;
+	console() << endl;*/
+
+	Entry* entry = starbucks->getNearest(0.103189049,0.4057225);
+		
+	console() << "Your nearest Starbucks:" << endl
+		<< entry->identifier << endl << entry->x << endl << entry->y;
 
 }
 

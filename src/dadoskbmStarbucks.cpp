@@ -1,48 +1,39 @@
 #include "dadoskbmStarbucks.h"
 #include <vector>
 #include <cmath>
+#include "cinder/app/App.h"
+#ifdef SHOW_TIMES
+  #include <ctime>
+#endif
 
 using namespace std;
 
+
 //Private, recursive method that places the given node in its proper position in the X-tree.
-void placeX(Node* toPlace, Node* parent) 
+Node* placeX(Entry toPlace, Node* parent) 
 {
 	if(parent == NULL)
-		parent = toPlace;
-	else if(toPlace->item.x < parent->item.x)
-	{
-		if(parent->leftX == NULL)
-			parent->leftX = toPlace;
-		else
-			placeX(toPlace, parent->leftX);
-	}
+		parent = new Node(toPlace);
+	else if(parent->item.x == toPlace.x)
+		return parent;
+	else if(toPlace.x < parent->item.x)
+		parent->leftX = placeX(toPlace,parent->leftX);
 	else
-	{
-		if(parent->rightX == NULL)
-			parent->rightX = toPlace;
-		else
-			placeX(toPlace, parent->rightX);
-	}
+		parent->rightX = placeX(toPlace, parent->rightX);
+	return parent;
 }
 //Same method for Y-tree.
-void placeY(Node* toPlace, Node* parent) 
+Node* placeY(Entry toPlace, Node* parent) 
 {
 	if(parent == NULL)
-		parent = toPlace;
-	else if(toPlace->item.y < parent->item.y)
-	{
-		if(parent->leftY == NULL)
-			parent->leftY = toPlace;
-		else
-			placeY(toPlace, parent->leftY);
-	}
+		parent = new Node(toPlace);
+	else if(parent->item.y == toPlace.y)
+		return parent;
+	else if(toPlace.y < parent->item.y)
+		parent->leftY = placeY(toPlace,parent->leftY);
 	else
-	{
-		if(parent->rightY == NULL)
-			parent->rightY = toPlace;
-		else
-			placeY(toPlace, parent->rightY);
-	}
+		parent->rightY = placeY(toPlace, parent->rightY);
+	return parent;
 }
 /**
 * Creates a node for a given item and initializes the child nodes to NULL
@@ -67,7 +58,10 @@ double Node::distance(double& x,double& y)
 /**
 * Calculates the distance between this node and the given node.
 */
-double Node::distance(Node* node) {return 0.0;}
+double Node::distance(Node* node)
+{
+	return distance(node->item.x, node->item.y);
+}
 
 /**
 * Constructor.
@@ -85,11 +79,22 @@ dadoskbmStarbucks::dadoskbmStarbucks()
 */
 void dadoskbmStarbucks::build(Entry* c,int n)
 {
+#ifdef SHOW_TIMES
+	int stepCount = 0;
+	int time = clock();
+#endif
 	for(int i = 0; i < n; i++)
 	{
-		placeX(new Node(c[i]), root);
-		placeY(new Node(c[i]), root);
+		root = placeX(c[i], root);
+		root = placeY(c[i], root);
+#ifdef SHOW_TIMES
+		stepCount++;
+#endif
 	}
+#ifdef SHOW_TIMES
+	int timeTaken = (clock() - time); //Clock increment is 1 ms
+	ci::app::console() << "Build called\nSteps taken: " << stepCount << "\nTime taken: " << timeTaken << "ms" << endl;
+#endif
 }
 	
 /**
@@ -101,15 +106,26 @@ void dadoskbmStarbucks::build(Entry* c,int n)
 */
 Entry* dadoskbmStarbucks::getNearest(double x,double y)
 {
+#ifdef SHOW_TIMES
+	int stepCountX = 0;
+	int stepCountY = 0;
+	int time = clock();
+#endif
 	vector<Node*> items = vector<Node*>();
-	for(Node* cur = root; cur != NULL;)
+	Node* cur;
+	do
 	{
+		cur = root;
 		items.push_back(cur);
 		if(x < cur->item.x)
 			cur = cur->leftX;
 		else
 			cur = cur->rightX;
-	}
+	
+#ifdef SHOW_TIMES
+		stepCountX++;
+#endif
+	} while(cur != NULL);
 	Node* closestX = NULL;
 	while(!items.empty())
 	{
@@ -121,14 +137,19 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 
 	//Now same for Y:
 	vector<Node*> items2 = vector<Node*>();
-	for(Node* cur = root; cur != NULL;)
+	cur = NULL; //Reset for Y-tree
+	do
 	{
 		items2.push_back(cur);
 		if(y < cur->item.y)
 			cur = cur->leftY;
 		else
 			cur = cur->rightY;
-	}
+	
+#ifdef SHOW_TIMES
+		stepCountY++;
+#endif
+	} while(cur != NULL);
 	Node* closestY = NULL;
 	while(!items2.empty())
 	{
@@ -137,6 +158,10 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 		if(closestY == NULL || cur->distance(x,y) < closestX->distance(x,y))
 			closestX = cur;
 	}
+#ifdef SHOW_TIMES
+	int timeTaken = (clock() - time); //Clock increment is 1 ms
+	ci::app::console() << "Get Nearest called\nSteps taken(X): " << stepCountX << "\nSteps taken(Y): " << stepCountY << "\nTime taken: " << timeTaken << "ms" << endl;
+#endif
 
 	if(closestX->distance(x,y) < closestY->distance(x,y))
 		return &closestX->item;
