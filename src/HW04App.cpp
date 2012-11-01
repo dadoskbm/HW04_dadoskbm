@@ -22,7 +22,7 @@ private:
 
 void HW04App::setup()
 {
-	vector<Entry> entries = vector<Entry>();
+	vector<Entry> entries;
 	ifstream in = ifstream("..\\resources\\Starbucks_2006.csv", fstream::in );
 	if(!in.is_open())
 	{
@@ -68,10 +68,10 @@ void HW04App::setup()
 	cin >> y;
 	console() << endl;*/
 
-	Entry* entry = starbucks->getNearest(0.103189049,0.4057225);
+	Entry* entry = starbucks->getNearest(0.489382678,0.610021);
 		
 	console() << "Your nearest Starbucks:" << endl
-		<< entry->identifier << endl << entry->x << endl << entry->y;
+		<< entry->identifier << endl << entry->x << endl << entry->y << endl;
 
 }
 

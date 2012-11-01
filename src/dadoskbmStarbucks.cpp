@@ -86,10 +86,13 @@ void dadoskbmStarbucks::build(Entry* c,int n)
 	for(int i = 0; i < n; i++)
 	{
 		root = placeX(c[i], root);
-		root = placeY(c[i], root);
 #ifdef SHOW_TIMES
 		stepCount++;
 #endif
+	}
+	for(int i = 0; i < n; i++)
+	{
+		root = placeY(c[i], root);
 	}
 #ifdef SHOW_TIMES
 	int timeTaken = (clock() - time); //Clock increment is 1 ms
@@ -112,10 +115,9 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	int time = clock();
 #endif
 	vector<Node*> items = vector<Node*>();
-	Node* cur;
+	Node* cur = root;
 	do
 	{
-		cur = root;
 		items.push_back(cur);
 		if(x < cur->item.x)
 			cur = cur->leftX;
@@ -137,7 +139,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 
 	//Now same for Y:
 	vector<Node*> items2 = vector<Node*>();
-	cur = NULL; //Reset for Y-tree
+	cur = root; //Reset for Y-tree
 	do
 	{
 		items2.push_back(cur);
@@ -148,6 +150,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	
 #ifdef SHOW_TIMES
 		stepCountY++;
+		int time = clock();
 #endif
 	} while(cur != NULL);
 	Node* closestY = NULL;
@@ -156,7 +159,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 		Node* cur = items2.back();
 		items2.pop_back();
 		if(closestY == NULL || cur->distance(x,y) < closestX->distance(x,y))
-			closestX = cur;
+			closestY = cur;
 	}
 #ifdef SHOW_TIMES
 	int timeTaken = (clock() - time); //Clock increment is 1 ms
