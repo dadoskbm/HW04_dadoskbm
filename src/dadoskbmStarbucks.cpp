@@ -10,30 +10,52 @@ using namespace std;
 
 
 //Private, recursive method that places the given node in its proper position in the X-tree.
-Node* placeX(Entry toPlace, Node* parent) 
+void placeX(Node* toPlace, Node* parent) 
 {
 	if(parent == NULL)
-		parent = new Node(toPlace);
-	else if(parent->item.x == toPlace.x)
-		return parent;
-	else if(toPlace.x < parent->item.x)
-		parent->leftX = placeX(toPlace,parent->leftX);
+		parent = toPlace;
+	else if(toPlace->item.x < parent->item.x)
+	{
+		if(parent->leftX == NULL)
+		{
+			parent->leftX = toPlace;
+		}
+		else
+			placeX(toPlace, parent->leftX);
+	}
 	else
-		parent->rightX = placeX(toPlace, parent->rightX);
-	return parent;
+	{
+		if(parent->rightX == NULL)
+		{
+			parent->rightX = toPlace;
+		}
+		else
+			placeX(toPlace, parent->rightX);
+	}
 }
 //Same method for Y-tree.
-Node* placeY(Entry toPlace, Node* parent) 
+void placeY(Node* toPlace, Node* parent) 
 {
 	if(parent == NULL)
-		parent = new Node(toPlace);
-	else if(parent->item.y == toPlace.y)
-		return parent;
-	else if(toPlace.y < parent->item.y)
-		parent->leftY = placeY(toPlace,parent->leftY);
+		parent = toPlace;
+	else if(toPlace->item.y < parent->item.y)
+	{
+		if(parent->leftY == NULL)
+		{
+			parent->leftY = toPlace;
+		}
+		else
+			placeY(toPlace, parent->leftY);
+	}
 	else
-		parent->rightY = placeY(toPlace, parent->rightY);
-	return parent;
+	{
+		if(parent->rightY == NULL)
+		{
+			parent->rightY = toPlace;
+		}
+		else
+			placeY(toPlace, parent->rightY);
+	}
 }
 /**
 * Creates a node for a given item and initializes the child nodes to NULL
@@ -79,13 +101,22 @@ dadoskbmStarbucks::dadoskbmStarbucks()
 */
 void dadoskbmStarbucks::build(Entry* c,int n)
 {
+	if(n == 0) return; //Don't build an empty list!
 #ifdef SHOW_TIMES
-	int stepCount = 0;
+	int stepCount = 1;
 	int time = clock();
 #endif
-	for(int i = 0; i < n; i++)
+	//Create the root
+	root = new Node(c[0]);
+	for(int i = 1; i < n; i++)
 	{
+<<<<<<< HEAD
 		root = placeX(c[i], root);
+=======
+		Node* node = new Node(c[i]);
+		placeX(node, root);
+		placeY(node, root);
+>>>>>>> Trees now functional, started map work.
 #ifdef SHOW_TIMES
 		stepCount++;
 #endif
@@ -114,7 +145,11 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	int stepCountY = 0;
 	int time = clock();
 #endif
+<<<<<<< HEAD
 	vector<Node*> items = vector<Node*>();
+=======
+	vector<Node*> items;
+>>>>>>> Trees now functional, started map work.
 	Node* cur = root;
 	do
 	{
@@ -138,7 +173,11 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	}
 
 	//Now same for Y:
+<<<<<<< HEAD
 	vector<Node*> items2 = vector<Node*>();
+=======
+	vector<Node*> items2;
+>>>>>>> Trees now functional, started map work.
 	cur = root; //Reset for Y-tree
 	do
 	{
@@ -153,6 +192,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 		int time = clock();
 #endif
 	} while(cur != NULL);
+
 	Node* closestY = NULL;
 	while(!items2.empty())
 	{
