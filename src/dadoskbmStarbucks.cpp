@@ -2,9 +2,6 @@
 #include <vector>
 #include <cmath>
 #include "cinder/app/App.h"
-#ifdef SHOW_TIMES
-  #include <ctime>
-#endif
 
 using namespace std;
 
@@ -12,6 +9,7 @@ using namespace std;
 //Private, recursive method that places the given node in its proper position in the X-tree.
 void placeX(Node* toPlace, Node* parent) 
 {
+	
 	if(parent == NULL)
 		parent = toPlace;
 	else if(toPlace->item.x < parent->item.x)
@@ -110,20 +108,12 @@ void dadoskbmStarbucks::build(Entry* c,int n)
 	root = new Node(c[0]);
 	for(int i = 1; i < n; i++)
 	{
-<<<<<<< HEAD
-		root = placeX(c[i], root);
-=======
 		Node* node = new Node(c[i]);
 		placeX(node, root);
 		placeY(node, root);
->>>>>>> Trees now functional, started map work.
 #ifdef SHOW_TIMES
 		stepCount++;
 #endif
-	}
-	for(int i = 0; i < n; i++)
-	{
-		root = placeY(c[i], root);
 	}
 #ifdef SHOW_TIMES
 	int timeTaken = (clock() - time); //Clock increment is 1 ms
@@ -145,11 +135,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	int stepCountY = 0;
 	int time = clock();
 #endif
-<<<<<<< HEAD
-	vector<Node*> items = vector<Node*>();
-=======
 	vector<Node*> items;
->>>>>>> Trees now functional, started map work.
 	Node* cur = root;
 	do
 	{
@@ -173,11 +159,7 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	}
 
 	//Now same for Y:
-<<<<<<< HEAD
-	vector<Node*> items2 = vector<Node*>();
-=======
 	vector<Node*> items2;
->>>>>>> Trees now functional, started map work.
 	cur = root; //Reset for Y-tree
 	do
 	{
@@ -189,7 +171,6 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	
 #ifdef SHOW_TIMES
 		stepCountY++;
-		int time = clock();
 #endif
 	} while(cur != NULL);
 
@@ -203,12 +184,11 @@ Entry* dadoskbmStarbucks::getNearest(double x,double y)
 	}
 #ifdef SHOW_TIMES
 	int timeTaken = (clock() - time); //Clock increment is 1 ms
-	ci::app::console() << "Get Nearest called\nSteps taken(X): " << stepCountX << "\nSteps taken(Y): " << stepCountY << "\nTime taken: " << timeTaken << "ms" << endl;
+	ci::app::console() << "Get Nearest called\nSteps taken(X): " << stepCountX << "\nSteps taken(Y): " << stepCountY << "\nTime taken: " << timeTaken << " ms" << endl;
 #endif
 
 	if(closestX->distance(x,y) < closestY->distance(x,y))
 		return &closestX->item;
 	else
 		return &closestY->item;
-
 }

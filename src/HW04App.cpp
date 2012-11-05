@@ -1,15 +1,16 @@
 #include "cinder/app/AppBasic.h"
-#include "cinder/gl/gl.h"
 #include "cinder/ImageIo.h"
 #include "dadoskbmStarbucks.h"
+#include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
+#include "cinder/Font.h"
+#include "cinder/Text.h"
 #include <fstream>
-#include <string>
 
-#define WIDTH 701
-#define HEIGHT 565
-#define MAP_WIDTH 701
-#define MAP_HEIGHT 565
+#define WIDTH 764
+#define HEIGHT 424
+#define MAP_WIDTH 764
+#define MAP_HEIGHT 424
 #define MAP_OFFSET_X 0
 #define MAP_OFFSET_Y 0
 
@@ -26,22 +27,26 @@ class HW04App : public AppBasic {
 	void prepareSettings(Settings* settings);
 
 private:
-	Starbucks* starbucks;
-	Surface bg, layer_markers;
+	dadoskbmStarbucks* starbucks;
+	Surface bg, clone;
+	Vec2i lastHighlighted;
 };
 
 /**
  * Converts data coordinates (from Starbucks.h) to image coordinates
  */
-Vec2i coord2Img(double& x, double& y);
+Vec2i coord2Img(const double& x, const double& y);
 
 /**
  * Converts image coordinates to data coordinates (From Starbucks.h)
  */
-Vec2f img2Coord(int& x, int& y);
+Vec2f img2Coord(const int& x, const int& y);
 
 void HW04App::setup()
 {
+	//Initialize random number generator
+	srand(time(NULL));
+
 	vector<Entry> entries;
 	ifstream in = ifstream("..\\resources\\Starbucks_2006.csv", fstream::in );
 	if(!in.is_open())
@@ -80,13 +85,6 @@ void HW04App::setup()
 	starbucks = new dadoskbmStarbucks();
 	starbucks->build(arr, entries.size());
 
-
-<<<<<<< HEAD
-	Entry* entry = starbucks->getNearest(0.489382678,0.610021);
-		
-	console() << "Your nearest Starbucks:" << endl
-		<< entry->identifier << endl << entry->x << endl << entry->y << endl;
-=======
 	/*
 	//DEBUG CODE:
 	Entry* entry = starbucks->getNearest(0.167744693,0.3479477);
@@ -96,9 +94,18 @@ void HW04App::setup()
 	*/
 
 	//DRAWING SETUP
+	lastHighlighted = Vec2i(-1, -1);
 	bg = loadImage("..\\resources\\usa.jpg");
+	clone = bg.clone();
+	
+	for(unsigned int i = 0; i < entries.size(); i++)
+	{
+		Entry entry = entries[i];
+		Vec2i coords = coord2Img(entry.x, entry.y);
+		clone.setPixel(coords, Color8u(0xff,0x00,0x00));
+	}
+	
 }
->>>>>>> Trees now functional, started map work.
 
 void HW04App::prepareSettings(Settings* settings)
 {
@@ -108,6 +115,21 @@ void HW04App::prepareSettings(Settings* settings)
 
 void HW04App::mouseDown( MouseEvent event )
 {
+	Vec2f coords = img2Coord(event.getX(), event.getY());
+	Entry* entry = starbucks->getNearest(coords.x, coords.y);
+
+	Vec2i currentLoc = coord2Img(entry->x, entry->y);
+
+	//Clear last highlighted and set to nearest Starbucks
+	if(lastHighlighted.x != -1)
+		clone.setPixel(lastHighlighted, Color8u(0xff, 0x00, 0x00));
+	lastHighlighted = currentLoc;
+
+	clone.setPixel(currentLoc, Color8u(0xee, 0xc9, 0x00));
+	
+
+	console() << "Your nearest Starbucks:" << endl
+		<< entry->identifier << endl << entry->x << endl << entry->y << endl;
 }
 
 void HW04App::update()
@@ -116,17 +138,18 @@ void HW04App::update()
 
 void HW04App::draw()
 {
-	gl::draw(bg);
+	gl::draw(gl::Texture(clone));
+	gl::drawSolidCircle(lastHighlighted, 4);
 }
 
 Vec2i coord2Img(const double& x, const double& y)
 {
-	return Vec2i(floor(x * MAP_WIDTH) + MAP_OFFSET_X, floor(y * HEIGHT) + MAP_OFFSET_Y);
+	return Vec2i(floor(x * MAP_WIDTH) + MAP_OFFSET_X, floor(HEIGHT - (y * HEIGHT)) + MAP_OFFSET_Y);
 }
 
 Vec2f img2Coord(const int& x, const int& y)
 {
-	return Vec2f((double)(x - MAP_OFFSET_X)/(double)WIDTH,(double)(y - MAP_OFFSET_Y)/(double)HEIGHT);
+	return Vec2f((double)(x - MAP_OFFSET_X)/(double)WIDTH,(double)((HEIGHT - y) - MAP_OFFSET_Y)/(double)HEIGHT);
 }
 
 CINDER_APP_BASIC( HW04App, RendererGl )
